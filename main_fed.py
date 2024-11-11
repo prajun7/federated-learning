@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
+import certifi
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ import copy
 import numpy as np
 from torchvision import datasets, transforms
 import torch
+import ssl
 
 from utils.sampling import mnist_iid, mnist_noniid, cifar_iid
 from utils.options import args_parser
@@ -17,6 +19,8 @@ from models.Nets import MLP, CNNMnist, CNNCifar
 from models.Fed import FedAvg
 from models.test import test_img
 
+ssl._create_default_https_context = ssl._create_unverified_context
+ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 if __name__ == '__main__':
     # parse args

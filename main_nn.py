@@ -2,19 +2,25 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
+import os
+import ssl
+import certifi
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from torchvision import datasets, transforms
-
 from utils.options import args_parser
 from models.Nets import MLP, CNNMnist, CNNCifar
 
+ssl._create_default_https_context = ssl._create_unverified_context
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+
+matplotlib.use('Agg')
 
 def test(net_g, data_loader):
     # testing
@@ -35,7 +41,6 @@ def test(net_g, data_loader):
         100. * correct / len(data_loader.dataset)))
 
     return correct, test_loss
-
 
 if __name__ == '__main__':
     # parse args
@@ -104,7 +109,14 @@ if __name__ == '__main__':
     plt.plot(range(len(list_loss)), list_loss)
     plt.xlabel('epochs')
     plt.ylabel('train loss')
-    plt.savefig('./log/nn_{}_{}_{}.png'.format(args.dataset, args.model, args.epochs))
+
+    # Ensure the log directory exists
+    log_dir = './log/'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    # save plot
+    plt.savefig(os.path.join(log_dir, 'nn_{}_{}_{}.png'.format(args.dataset, args.model, args.epochs)))
 
     # testing
     if args.dataset == 'mnist':

@@ -87,20 +87,31 @@ if __name__ == '__main__':
     list_loss = []
     net_glob.train()
     for epoch in range(args.epochs):
-        batch_loss = []
+        batch_loss = []  # Track loss for each batch in the epoch
         for batch_idx, (data, target) in enumerate(train_loader):
+            # Move data to the specified device (CPU or GPU)
             data, target = data.to(args.device), target.to(args.device)
+
             optimizer.zero_grad()
+
+            # Step 1: Forward pass - model makes predictions
             output = net_glob(data)
+
+            # Step 2: Calculate loss - error between prediction and actual target
             loss = F.cross_entropy(output, target)
-            loss.backward()
-            optimizer.step()
+
+            # Step 3: Backpropagation - adjust model parameters based on loss
+            loss.backward()        # Compute gradients
+            optimizer.step()       # Update the model weights``
+
             if batch_idx % 50 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
                            100. * batch_idx / len(train_loader), loss.item()))
+                
+            # Optionally, track and print loss for monitoring
             batch_loss.append(loss.item())
-        loss_avg = sum(batch_loss)/len(batch_loss)
+        loss_avg = sum(batch_loss)/len(batch_loss)     # Average loss over batches in epoch
         print('\nTrain loss:', loss_avg)
         list_loss.append(loss_avg)
 
